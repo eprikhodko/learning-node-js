@@ -1,4 +1,5 @@
-const products = [];
+const fs = require("fs");
+const path = require("path");
 
 module.exports = class Product {
   constructor(title) {
@@ -6,11 +7,55 @@ module.exports = class Product {
   }
 
   save() {
-    products.push(this);
+    const p = path.join(
+      path.dirname(require.main.filename),
+      "data",
+      "products.json"
+    );
+    // read products.json file from the "data" folder: /data/products.json
+    // we're will have either error or data from the file
+    fs.readFile(p, (err, fileData) => {
+      // console.log("file data:", fileData);
+      // we'll have either empty array, or array that we'll get from the file
+      let products = [];
+      if (!err) {
+        // convert json string data from fileData to the javascript object
+        products = JSON.parse(fileData);
+      }
+      // in any way, push to the array this. this – is an object that we're creating in the constructor
+      // pay attention that we're using arrow function here, so "this" will refer to the object
+      // not sure though if this still true
+      products.push(this);
+      console.log("this from the arrow function:", this);
+      fs.writeFile(p, JSON.stringify(products), (err) => {
+        console.log(err);
+      });
+    });
   }
 
-  static fetchAll() {
-    return products;
+  /* 
+  the "callback" parameter is a function that you can use to send the response back to the client after the file has been read and the "products" array has been populated.
+  */
+
+  static fetchAll(callback) {
+    const p = path.join(
+      path.dirname(require.main.filename),
+      "data",
+      "products.json"
+    );
+
+    let products = [];
+
+    fs.readFile(p, (err, fileData) => {
+      console.log("error:", err);
+      if (err) {
+        return callback([]);
+      }
+
+      products = JSON.parse(fileData);
+
+      return callback(products);
+    });
   }
 };
 
