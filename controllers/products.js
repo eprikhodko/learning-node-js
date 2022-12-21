@@ -58,7 +58,7 @@ detailed explanation of how Product.fetchAll function work:
 
 Here is a step-by-step explanation of how the code works, with more specific information about which callback function is being referred to at each step:
 
-1. The exports.getProducts function is called when a GET request is made to the backend. This function is defined as follows:
+1. The exports.getProducts function is called when a GET request is made to the backend  (check shop.js route). This function is defined as follows:
 
 exports.getProducts = (req, res, next) => {
   Product.fetchAll((products) => {
@@ -91,6 +91,7 @@ static fetchAll(callback) {
     return callback(products);
   });
 }
+
 In this function, the fs.readFile() function is called to read the file. The fs.readFile() function is asynchronous, meaning that it does not block the execution of the rest of the code while it reads the file. Instead, it executes a callback function when the file has been read.
 
 The callback function that is executed by the fs.readFile() function is defined as an anonymous function and takes two arguments, "err" and "fileData".
