@@ -1,32 +1,37 @@
 const fs = require("fs");
 const path = require("path");
 
+const p = path.join(
+  path.dirname(require.main.filename),
+  "data",
+  "products.json"
+);
+
+const getProductsFromFile = (callback) => {
+  let products = [];
+
+  fs.readFile(p, (err, fileData) => {
+    console.log("error:", err);
+    if (err) {
+      return callback([]);
+    }
+
+    products = JSON.parse(fileData);
+
+    // fs.readFile executes callback once it finish reading the file
+    return callback(products);
+  });
+};
+
 module.exports = class Product {
   constructor(title) {
     this.title = title;
   }
 
   save() {
-    const p = path.join(
-      path.dirname(require.main.filename),
-      "data",
-      "products.json"
-    );
-    // read products.json file from the "data" folder: /data/products.json
-    // we're will have either error or data from the file
-    fs.readFile(p, (err, fileData) => {
-      // console.log("file data:", fileData);
-      // we'll have either empty array, or array that we'll get from the file
-      let products = [];
-      if (!err) {
-        // convert json string data from fileData to the javascript object
-        products = JSON.parse(fileData);
-      }
-      // in any way, push to the array this. this – is an object that we're creating in the constructor
-      // pay attention that we're using arrow function here, so "this" will refer to the object
-      // not sure though if this still true
+    getProductsFromFile((products) => {
       products.push(this);
-      console.log("this from the arrow function:", this);
+      console.log("getProductsFromFile:", this);
       fs.writeFile(p, JSON.stringify(products), (err) => {
         console.log(err);
       });
@@ -38,24 +43,7 @@ module.exports = class Product {
   */
 
   static fetchAll(callback) {
-    const p = path.join(
-      path.dirname(require.main.filename),
-      "data",
-      "products.json"
-    );
-
-    let products = [];
-
-    fs.readFile(p, (err, fileData) => {
-      console.log("error:", err);
-      if (err) {
-        return callback([]);
-      }
-
-      products = JSON.parse(fileData);
-
-      return callback(products);
-    });
+    getProductsFromFile(callback);
   }
 };
 
